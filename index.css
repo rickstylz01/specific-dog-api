@@ -14,3 +14,7 @@ body {
 .hidden {
   display: none;
 }
+
+.img-results {
+  max-width: 300px;
+}

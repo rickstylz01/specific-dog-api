@@ -1,44 +1,49 @@
 'use strict';
 
 function getDogImage() {
-  fetch(createdUrl())
+  fetch(customUrl())
     .then(response => response.json())
     .then(responseJson => displayToDom(responseJson))
-    .catch(error => alert('Something went wrong. Try again later.'))
+    .catch(error => console.log(error))
 }
 
-function createdUrl() {
-  let specificDogBreed = $('#specificDog').val();
-  return `https://dog.ceo/api/${specificDogBreed}/images/random`;
+function displayErrorMessage(error) {
+  let errorImageUrl = "images/sorry-cat.jpg";
+  $('.img-results').attr('src', errorImageUrl);
+  let errorMessage = error.message;
+  $('.results').append(generateErrorMessage(errorMessage));
+  $('.results').toggle();
 }
 
-function imageHtmlString(urlString) {
-  return `<img src="${urlString}" class="img-results">`
-}
-
-function replaceImage(urlString) {
-  $('#img-results').replaceWith(imageHtmlString(urlString));
+function customUrl() {
+  let specificDog = $('#specificDog').val();
+  return `https://dog.ceo/api/breed/${specificDog}/images`;
 }
 
 function displayToDom(responseJson) {
- console.log(responseJson);
- //get the img url from the json message key
- let imageUrl = responseJson.message;
- $('#img-results').replaceImage
- //remove the hidden class
-  $('.results').removeClass('hidden');
+  console.log(responseJson);
+  if (responseJson.status === "success") {
+    let imageUrlArray = responseJson.message;
+    let singleImageUrl = imageUrlArray[0];
+    $('.img-results').attr('src', singleImageUrl);
+    removeErrorMessage();
+    $(".results").removeClass('hidden');
+  } else {
+    displayErrorMessage(responseJson);
+  }
 }
 
+function generateErrorMessage(errorMessage) {
+  return `<b id="error-message">${errorMessage}</b>`
+}
 
-
-// function removeDisplayedImages() {
-//   $('.image-container').remove();
-// }
+function removeErrorMessage() {
+  $('#error-message').remove();
+}
 
 function watchForm() {
   $('form').submit(event => {
     event.preventDefault();
-    // removeDisplayedImages();
     getDogImage();
   });
 }
